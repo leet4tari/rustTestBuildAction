@@ -15,7 +15,7 @@ jobs:
         target:
 #          - x86_64-unknown-linux-gnu
           - x86_64-apple-darwin
-          - armv7-unknown-linux-gnueabihf
+#          - armv7-unknown-linux-gnueabihf
 #          - powerpc64-unknown-linux-gnu
 #          - aarch64-unknown-linux-gnu
 #          - aarch64-unknown-linux-musl
@@ -43,7 +43,8 @@ jobs:
         ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/release/'
+        ls -la '${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample*'
     - uses: actions/upload-artifact@v1
       with:
         name: release - ${{ matrix.target }}
-        path: ${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample
+        path: '${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample*'
