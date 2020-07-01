@@ -43,8 +43,8 @@ jobs:
         ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/release/'
-        ls -la '${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample*'
+        ls -la "${{ github.workspace }}/target/${{ matrix.target }}/release/"{cross-compile-sample,cross-compile-sample.exe}
     - uses: actions/upload-artifact@v1
       with:
         name: release - ${{ matrix.target }}
-        path: '${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample*'
+        path: '${{ github.workspace }}/target/${{ matrix.target }}/release/'cross-compile-sample*
