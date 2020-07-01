@@ -1,19 +1,36 @@
 on: push
 jobs:
   build:
-    name: Build
+    name: Build Binaries
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout source code
+      uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
 #        target: ${{ matrix.target }}
         override: true
-    - uses: actions-rs/cargo@v1
+    # Install OS specific dependencies
+    - name: Install Linux dependencies
+      if: matrix.platform == 'ubuntu-latest'
+      run: sudo apt-get install re2c
+    - name: Install macOS dependencies
+      if: matrix.platform == 'macOS-latest'
+      run: brew install re2c p7zip cmake
+    - name: Install Windows dependencies
+      if: matrix.platform == 'windows-latest'
+      run: choco install re2c
+#    - name: Install Rust
+#      uses: actions-rs/toolchain@v1
+#      with:
+#        toolchain: nightly-2020-06-10
+#        components: rustfmt
+    - name: Build ubuntu binaries
+      uses: actions-rs/cargo@v1
       env:
         CC: gcc
       with:
@@ -27,8 +44,16 @@ jobs:
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/release/'
-        ls -la '${{ github.workspace }}/target/release/cross-compile-sample*'
-    - uses: actions/upload-artifact@v1
+        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
+    - name: Upload Windows binary
+      if: matrix.platform == 'windows-latest'
+      uses: actions/upload-artifact@v1
       with:
         name: release - ${{ matrix.platform }}
-        path: '${{ github.workspace }}/target/release/cross-compile-sample*'
+        path: '${{ github.workspace }}/target/release/cross-compile-sample.exe'
+    - name: Upload Nix binary
+      if: matrix.platform != 'windows-latest'
+      uses: actions/upload-artifact@v1
+      with:
+        name: release - ${{ matrix.platform }}
+        path: '${{ github.workspace }}/target/release/cross-compile-sample'
