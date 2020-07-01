@@ -34,7 +34,12 @@ jobs:
 #        use-cross: true
         command: build
         args: --release --target=${{ matrix.target }}
+    - run: |
+        ls -la ${{ github.workspace }}
+        ls -la ${{ github.workspace }}/target/
+        ls -la ${{ github.workspace }}/target/${{ matrix.target }}/
+        ls -la ${{ github.workspace }}/target/${{ matrix.target }}/release/
     - uses: actions/upload-artifact@v1
       with:
         name: release - ${{ matrix.target }}
-        path: target/${{ matrix.target }}/release/cross-compile-sample
+        path: ${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample
