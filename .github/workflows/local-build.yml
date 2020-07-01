@@ -34,3 +34,7 @@ jobs:
 #        use-cross: true
         command: build
         args: --release --target=${{ matrix.target }}
+    - uses: actions/upload-artifact@v1
+      with:
+        name: release - ${{ matrix.target }}
+        path: target/${{ matrix.target }}/release/cross-compile-sample

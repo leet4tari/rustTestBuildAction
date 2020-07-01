@@ -19,3 +19,7 @@ jobs:
         command: build
 #        args: --release --target=${{ matrix.target }}
         args: --release
+    - uses: actions/upload-artifact@v1
+      with:
+        name: release - ${{ matrix.platform }}
+        path: target/release/cross-compile-sample
