@@ -16,10 +16,10 @@ jobs:
           - x86_64-unknown-linux-gnu
           - x86_64-apple-darwin
           - armv7-unknown-linux-gnueabihf
-          - powerpc64-unknown-linux-gnu
-          - aarch64-unknown-linux-gnu
+#          - powerpc64-unknown-linux-gnu
+#          - aarch64-unknown-linux-gnu
 #          - aarch64-unknown-linux-musl
-          - x86_64-pc-windows-gnu
+#          - x86_64-pc-windows-gnu
 #          - x86_64-pc-windows-msvc
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +29,8 @@ jobs:
         target: ${{ matrix.target }}
         override: true
     - uses: actions-rs/cargo@v1
+      env:
+        CC: gcc
       continue-on-error: true  # WARNING: only for this example, remove it!
       with:
 #        use-cross: true
@@ -37,7 +39,7 @@ jobs:
     - shell: bash
       run: |
         ls -la ${{ github.workspace }}
-        ls -la ${{ github.workspace }}/target/
+        ls -la '${{ github.workspace }}/target/'
         ls -la ${{ github.workspace }}/target/${{ matrix.target }}/
         ls -la ${{ github.workspace }}/target/${{ matrix.target }}/release/
     - uses: actions/upload-artifact@v1
