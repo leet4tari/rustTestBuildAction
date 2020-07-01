@@ -31,6 +31,6 @@ jobs:
     - uses: actions-rs/cargo@v1
       continue-on-error: true  # WARNING: only for this example, remove it!
       with:
-        use-cross: true
+#        use-cross: true
         command: build
         args: --release --target=${{ matrix.target }}
