@@ -19,7 +19,8 @@ jobs:
         command: build
 #        args: --release --target=${{ matrix.target }}
         args: --release
-    - run: |
+    - shell: bash
+      run: |
         ls -la ${{ github.workspace }}
         ls -la ${{ github.workspace }}/target/
         ls -la ${{ github.workspace }}/target/release/
