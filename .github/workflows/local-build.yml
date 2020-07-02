@@ -50,5 +50,5 @@ jobs:
       - name: Uploads binaries
         uses: actions/upload-artifact@v2
         with:
-          name: release - ${{ matrix.target }}
-          path: '${{ github.workspace }}/target/${{ matrix.target }}/release/'cross-compile-sample*
+          name: 'test-${{ matrix.target }}-release'
+          path: '${{ github.workspace }}/target/${{ matrix.target }}/release/cross-compile-sample*'
