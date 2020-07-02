@@ -40,7 +40,6 @@ jobs:
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
         ls -la '${{ github.workspace }}'
-#        ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/release/'
 #        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
     - name: Upload Windows binary
