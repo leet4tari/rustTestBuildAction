@@ -1,7 +1,7 @@
 on: push
 jobs:
   build:
-    name: Build Binaries
+    name: Building Binaries
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -9,9 +9,12 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+#        toolchain: nightly-2020-06-10
+#        components: rustfmt
 #        target: ${{ matrix.target }}
         override: true
     # Install OS specific dependencies
@@ -24,12 +27,7 @@ jobs:
     - name: Install Windows dependencies
       if: matrix.platform == 'windows-latest'
       run: choco install re2c
-#    - name: Install Rust
-#      uses: actions-rs/toolchain@v1
-#      with:
-#        toolchain: nightly-2020-06-10
-#        components: rustfmt
-    - name: Build ubuntu binaries
+    - name: Build binaries
       uses: actions-rs/cargo@v1
       env:
         CC: gcc
@@ -41,10 +39,10 @@ jobs:
     - shell: bash
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
-        ls -la '${{ github.workspace }}'
-        ls -la '${{ github.workspace }}/target/'
+#        ls -la '${{ github.workspace }}'
+#        ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/release/'
-        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
+#        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
     - name: Upload Windows binary
       if: matrix.platform == 'windows-latest'
       uses: actions/upload-artifact@v1
