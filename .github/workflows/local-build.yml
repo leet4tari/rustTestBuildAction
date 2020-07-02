@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         target:
-#          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-gnu
           - x86_64-apple-darwin
 #          - armv7-unknown-linux-gnueabihf
 #          - powerpc64-unknown-linux-gnu
@@ -33,7 +33,7 @@ jobs:
         CC: gcc
       continue-on-error: true  # WARNING: only for this example, remove it!
       with:
-#        use-cross: true
+        use-cross: true
         command: build
         args: --release --target=${{ matrix.target }}
     - shell: bash
@@ -43,7 +43,7 @@ jobs:
         ls -la '${{ github.workspace }}/target/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/'
         ls -la '${{ github.workspace }}/target/${{ matrix.target }}/release/'
-        ls -la "${{ github.workspace }}/target/${{ matrix.target }}/release/"{cross-compile-sample,cross-compile-sample.exe}
+#        ls -la "${{ github.workspace }}/target/${{ matrix.target }}/release/"{cross-compile-sample,cross-compile-sample.exe}
     - uses: actions/upload-artifact@v1
       with:
         name: release - ${{ matrix.target }}
