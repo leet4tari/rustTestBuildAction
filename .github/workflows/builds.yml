@@ -41,6 +41,10 @@ jobs:
     - name: Install Windows dependencies
       if: matrix.os == 'windows-latest'
       run: choco update zip psutils -y
+      run: |
+        dir 'C:\ProgramData\chocolatey\lib\psutils\tools'
+
+#        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
 
     - name: set environment variables - Nix
       continue-on-error: true  # WARNING: only for this example, remove it!
@@ -75,12 +79,14 @@ jobs:
       run: |
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/release/'
+#        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
 #        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
 
     - name: Prep binaries
       continue-on-error: true  # WARNING: only for this example, remove it!
       shell: bash
       run: |
+        printenv
         mkdir -p "$GITHUB_WORKSPACE/binaries/${{ matrix.os }}"
         cd "$GITHUB_WORKSPACE/binaries/${{ matrix.os }}"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
