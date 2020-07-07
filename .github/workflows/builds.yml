@@ -1,11 +1,24 @@
+name: Multi Platform Builder - Test
+
 on: push
+
+env:
+  target_cpu: "x86-64"
+  RUSTFLAGS: "-C target_cpu=x86-64"
+  features: "safe"
+#  TBN_FILENAME: 'tari_base_node'
+#  SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
+#  VCPKGRS_DYNAMIC: 1
+#  SQLITE_STATIC: 1
+#  SQLITE3_STATIC: 1
+
 jobs:
   build:
     name: Building Binaries
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -19,14 +32,14 @@ jobs:
         override: true
     # Install OS specific dependencies
     - name: Install Linux dependencies
-      if: matrix.platform == 'ubuntu-latest'
-      run: sudo apt-get install re2c
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install zip
     - name: Install macOS dependencies
-      if: matrix.platform == 'macOS-latest'
-      run: brew install re2c p7zip cmake
+      if: matrix.os == 'macOS-latest'
+      run: brew install p7zip cmake
     - name: Install Windows dependencies
-      if: matrix.platform == 'windows-latest'
-      run: choco install re2c
+      if: matrix.os == 'windows-latest'
+      run: choco update zip psutils -y
     - name: Build binaries
       uses: actions-rs/cargo@v1
       env:
@@ -42,15 +55,35 @@ jobs:
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/release/'
 #        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
+
+    - name: Prep binaries
+      continue-on-error: true  # WARNING: only for this example, remove it!
+      shell: bash
+      run: |
+        mkdir -p "$GITHUB_WORKSPACE/binaries/${{ matrix.os }}"
+        cd "$GITHUB_WORKSPACE/binaries/${{ matrix.os }}"
+        #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
+        VERSION="v0.1.0"
+        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${target_cpu}-${features}-${VERSION}"
+        echo "Filename is $BINFILE"
+        cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}" "./$BINFILE"
+        echo "Archive "${BINFILE} too "${BINFILE}.zip"
+        zip -j "${BINFILE}.zip" "${BINFILE}"
+        echo "Compute shasum"
+        shasum -a 256 "${BINFILE}.zip" ${BINFILE} >> "${BINFILE}.zip.sha256"
+        cat "${BINFILE}.zip.sha256"
+        echo "Verifications is "
+        shasum -a 256 --check "${BINFILE}.zip.sha256"
+
     - name: Upload Windows binary
-      if: matrix.platform == 'windows-latest'
+      if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v2
       with:
-        name: release - ${{ matrix.platform }}
+        name: release - ${{ matrix.os }}
         path: '${{ github.workspace }}/target/release/cross-compile-sample.exe'
     - name: Upload Nix binary
-      if: matrix.platform != 'windows-latest'
+      if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v2
       with:
-        name: release - ${{ matrix.platform }}
+        name: release - ${{ matrix.os }}
         path: '${{ github.workspace }}/target/release/cross-compile-sample'
