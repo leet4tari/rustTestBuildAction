@@ -17,7 +17,8 @@ jobs:
     name: Building Binaries
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
+#        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout source code
@@ -39,10 +40,12 @@ jobs:
       if: matrix.os == 'macOS-latest'
       run: brew install p7zip cmake
     - name: Install Windows dependencies
+      continue-on-error: true  # WARNING: only for this example, remove it!
       if: matrix.os == 'windows-latest'
       run: |
         choco upgrade zip psutils -y
         dir 'C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master'
+        shasum.ps1
 
 #        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
 
@@ -52,6 +55,7 @@ jobs:
       uses: allenevans/set-env@v1.0.0
       with:
         overwrite: true
+        SHARUN: 'shasum -a 256'
         CC: gcc
         TBN_FILENAME: 'cross-compile-sample'
     - name: set environment variables - Windows
@@ -60,6 +64,7 @@ jobs:
       uses: allenevans/set-env@v1.0.0
       with:
         overwrite: true
+        SHARUN: 'shasum.ps1 -a 256'
         TBN_FILENAME: 'cross-compile-sample.exe'
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
@@ -97,10 +102,10 @@ jobs:
         echo "Archive "${BINFILE} too "${BINFILE}.zip"
         zip -j "${BINFILE}.zip" "${BINFILE}"
         echo "Compute shasum"
-        shasum -a 256 "${BINFILE}.zip" ${BINFILE} >> "${BINFILE}.zip.sha256"
+        ${SHARUN} "${BINFILE}.zip" ${BINFILE} >> "${BINFILE}.zip.sha256"
         cat "${BINFILE}.zip.sha256"
         echo "Verifications is "
-        shasum -a 256 --check "${BINFILE}.zip.sha256"
+        ${SHARUN} --check "${BINFILE}.zip.sha256"
 
     - name: Upload Windows binary
       if: matrix.os == 'windows-latest'
