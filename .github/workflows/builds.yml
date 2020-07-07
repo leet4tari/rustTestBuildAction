@@ -3,8 +3,8 @@ name: Multi Platform Builder - Test
 on: push
 
 env:
-  target_cpu: "x86-64"
-  RUSTFLAGS: "-C target_cpu=x86-64"
+#  target_cpu: "x86-64"
+#  RUSTFLAGS: "-C target_cpu=x86-64"
   features: "safe"
 #  TBN_FILENAME: 'tari_base_node'
 #  SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
@@ -16,9 +16,16 @@ jobs:
   build:
     name: Building Binaries
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-#        os: [windows-latest]
+#        os: [windows-latest, self-hosted]
+        features: ["avx2", "safe"]
+        target_cpu: ["x86-64", "ivybridge", "skylake",]
+        exclude:
+          - target_cpu: "x86-64"
+            features: "avx2"
+
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout source code
@@ -66,20 +73,25 @@ jobs:
         TBN_FILENAME: 'cross-compile-sample.exe'
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
+#        RUSTFLAGS: '-C target_cpu=${{ target_cpu }}'
 #        CC: gcc
 
     - name: Build binaries
       uses: actions-rs/cargo@v1
       env:
-        CC: gcc
+        RUSTFLAGS: '-C target_cpu=${{ matrix.target_cpu }}'
+        ROARING_ARCH: '${{ matrix.target_cpu }}'
+#        CC: gcc
       with:
 #        use-cross: true
         command: build
-#        args: --release --target=${{ matrix.target }}
-        args: --release
+        args: --release --features ${{ matrix.features }}
+#        args: --release
+
     - shell: bash
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
+        printenv
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/release/'
 #        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
@@ -94,7 +106,9 @@ jobs:
         cd "$GITHUB_WORKSPACE/binaries/${{ matrix.os }}"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
         VERSION="v0.1.0"
-        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${target_cpu}-${features}-${VERSION}"
+        echo ::set-env name=VERSION::${VERSION}
+        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}"
+        echo ::set-env name=BINFILE::${BINFILE}
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}" "./${BINFILE}"
         echo "Archive ${BINFILE} too ${BINFILE}.zip"
@@ -105,16 +119,12 @@ jobs:
         echo "Verifications is "
         ${SHARUN} --check "${BINFILE}.zip.sha256"
         ls -la
+        printenv
 
-    - name: Upload Windows binary
-      if: matrix.os == 'windows-latest'
+    - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: release - ${{ matrix.os }}
-        path: '${{ github.workspace }}/target/release/cross-compile-sample.exe'
-    - name: Upload Nix binary
-      if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@v2
-      with:
-        name: release - ${{ matrix.os }}
-        path: '${{ github.workspace }}/target/release/cross-compile-sample'
+        name: release - ${{ matrix.os }} ${{ matrix.target_cpu }} ${{ matrix.features }}
+        path: |
+          '${{ github.workspace }}/binaries/${{ matrix.os }}/${{ env.BINFILE }}.zip'
+          '${{ github.workspace }}/binaries/${{ matrix.os }}/${{ env.BINFILE }}.zip.sha256'
