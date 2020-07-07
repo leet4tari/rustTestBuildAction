@@ -95,15 +95,16 @@ jobs:
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
         VERSION="v0.1.0"
         BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${target_cpu}-${features}-${VERSION}"
-        echo "Filename is $BINFILE"
-        cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}" "./$BINFILE"
-        echo "Archive "${BINFILE} too "${BINFILE}.zip"
+        echo "Copying file ${BINFILE} too $(pwd)"
+        cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}" "./${BINFILE}"
+        echo "Archive ${BINFILE} too ${BINFILE}.zip"
         zip -j "${BINFILE}.zip" "${BINFILE}"
         echo "Compute shasum"
-        ${SHARUN} "${BINFILE}.zip" ${BINFILE} >> "${BINFILE}.zip.sha256"
+        ${SHARUN} "${BINFILE}.zip" >> "${BINFILE}.zip.sha256"
         cat "${BINFILE}.zip.sha256"
         echo "Verifications is "
         ${SHARUN} --check "${BINFILE}.zip.sha256"
+        ls -la
 
     - name: Upload Windows binary
       if: matrix.os == 'windows-latest'
