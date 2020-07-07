@@ -127,6 +127,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: release - ${{ matrix.os }} ${{ matrix.target_cpu }} ${{ matrix.features }}
-        path: |
-          '${{ github.workspace }}/binaries/${{ matrix.os }}/${{ env.BINFILE }}.zip'
-          '${{ github.workspace }}/binaries/${{ matrix.os }}/${{ env.BINFILE }}.zip.sha256'
+        path: '${{ github.workspace }}/binaries/${{ matrix.os }}/${{ env.BINFILE }}.zip*'
