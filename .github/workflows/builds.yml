@@ -30,6 +30,7 @@ jobs:
 #        components: rustfmt
 #        target: ${{ matrix.target }}
         override: true
+
     # Install OS specific dependencies
     - name: Install Linux dependencies
       if: matrix.os == 'ubuntu-latest'
@@ -40,6 +41,26 @@ jobs:
     - name: Install Windows dependencies
       if: matrix.os == 'windows-latest'
       run: choco update zip psutils -y
+
+    - name: set environment variables - Nix
+      continue-on-error: true  # WARNING: only for this example, remove it!
+      if: "!startsWith(matrix.os,'Windows')"
+      uses: allenevans/set-env@v1.0.0
+      with:
+        overwrite: true
+        CC: gcc
+        TBN_FILENAME: 'tari_base_node'
+    - name: set environment variables - Windows
+      continue-on-error: true  # WARNING: only for this example, remove it!
+      if: startsWith(matrix.os,'Windows')
+      uses: allenevans/set-env@v1.0.0
+      with:
+        overwrite: true
+        TBN_FILENAME: 'tari_base_node.exe'
+#        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
+#        RUSTFLAGS: '-Ctarget-feature=+crt-static'
+#        CC: gcc
+
     - name: Build binaries
       uses: actions-rs/cargo@v1
       env:
