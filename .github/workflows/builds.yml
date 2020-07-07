@@ -45,7 +45,7 @@ jobs:
       run: |
         choco upgrade zip psutils -y
         dir 'C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master'
-        shasum.ps1
+        C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1
 
 #        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
 
@@ -64,7 +64,7 @@ jobs:
       uses: allenevans/set-env@v1.0.0
       with:
         overwrite: true
-        SHARUN: 'shasum.ps1 -a 256'
+        SHARUN: 'C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 -a 256'
         TBN_FILENAME: 'cross-compile-sample.exe'
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
