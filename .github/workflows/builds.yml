@@ -49,14 +49,14 @@ jobs:
       with:
         overwrite: true
         CC: gcc
-        TBN_FILENAME: 'tari_base_node'
+        TBN_FILENAME: 'cross-compile-sample'
     - name: set environment variables - Windows
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'Windows')
       uses: allenevans/set-env@v1.0.0
       with:
         overwrite: true
-        TBN_FILENAME: 'tari_base_node.exe'
+        TBN_FILENAME: 'cross-compile-sample.exe'
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
 #        CC: gcc
