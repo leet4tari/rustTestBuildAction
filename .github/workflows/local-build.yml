@@ -1,6 +1,9 @@
-on: push
-
 name: Local-Build
+
+on:
+  push:
+    branches:
+      - leet-*
 
 jobs:
   build:

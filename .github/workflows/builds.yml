@@ -24,7 +24,8 @@ jobs:
 #        os: [windows-latest, self-hosted]
         features: ["avx2", "safe"]
 #        target_cpu: ["x86-64", "ivybridge", "skylake"]
-        target_cpu: ["x86-64", "ivybridge"]
+#        target_cpu: ["x86-64", "ivybridge"]
+        target_cpu: ["x86-64"]
         exclude:
           - target_cpu: "x86-64"
             features: "avx2"
@@ -132,19 +133,20 @@ jobs:
       shell: bash
       run: |
         echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --verify --deep --display --verbose=4 "${$GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
-        spctl -a -v "${$GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${$GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Post Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --verify --deep --display --verbose=4 "${$GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
-        spctl -a -v "${$GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
 
     - name: Archive and Sign Binaries
       continue-on-error: true  # WARNING: only for this example, remove it!
       shell: bash
       run: |
         echo "Archive ${{ env.BINFILE }} too ${{ env.BINFILE }}.zip"
+        cd "$GITHUB_WORKSPACE/dist/"
         zip -j "${{ env.BINFILE }}.zip" "${{ env.BINFILE }}"
         echo "Compute shasum"
         ${SHARUN} "${{ env.BINFILE }}.zip" >> "${{ env.BINFILE }}.zip.sha256"
