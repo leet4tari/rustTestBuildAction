@@ -130,9 +130,9 @@ jobs:
       if: startsWith(matrix.os,'macos')
       shell: bash
       run: |
-        echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --display --verbose=4 --verify --check-notarization --deep "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
-        spctl --assess --verbose "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
+        # echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
+        # codesign --display --verbose=4 --verify --check-notarization --deep "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
+        # spctl --assess --verbose "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
         codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Post Verify signed OSX Binary - ${{ env.BINFILE }} ..."
