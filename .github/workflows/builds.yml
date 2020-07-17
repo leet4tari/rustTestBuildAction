@@ -131,12 +131,13 @@ jobs:
       shell: bash
       run: |
         echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
+#        codesign --verify --check-notarization --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
+        codesign --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
         codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Post Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        codesign --verify --check-notarization --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
 
     - name: Archive and Sign Binaries
