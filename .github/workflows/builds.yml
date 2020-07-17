@@ -98,17 +98,16 @@ jobs:
     - shell: bash
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
-        printenv
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/release/'
 #        ls -la 'C:\ProgramData\chocolatey\lib\psutils\tools'
 #        ls -la "${{ github.workspace }}/target/release/"{cross-compile-sample,cross-compile-sample.exe}
+#        printenv
 
     - name: Pre Envs and Binary
       continue-on-error: true  # WARNING: only for this example, remove it!
       shell: bash
       run: |
-#        printenv
         mkdir -p "$GITHUB_WORKSPACE/dist/"
         cd "$GITHUB_WORKSPACE/dist/"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
@@ -145,7 +144,6 @@ jobs:
       continue-on-error: true  # WARNING: only for this example, remove it!
       shell: bash
       run: |
-#        printenv
         echo "Archive ${{ env.BINFILE }} too ${{ env.BINFILE }}.zip"
         zip -j "${{ env.BINFILE }}.zip" "${{ env.BINFILE }}"
         echo "Compute shasum"
