@@ -97,7 +97,7 @@ jobs:
         args: --release
 
     - shell: bash
-      continue-on-error: true  # WARNING: only for this example, remove it!
+#      continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
         ls -la '${{ github.workspace }}'
         ls -la '${{ github.workspace }}/target/release/'
@@ -106,7 +106,6 @@ jobs:
 #        printenv
 
     - name: Pre Envs and Binary
-      continue-on-error: true  # WARNING: only for this example, remove it!
       shell: bash
       run: |
         mkdir -p "$GITHUB_WORKSPACE/dist/"
@@ -120,7 +119,6 @@ jobs:
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
 
     - name: Import macOS Certs
-      continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'macos')
       uses: apple-actions/import-codesign-certs@v1
       with:
@@ -133,7 +131,7 @@ jobs:
       shell: bash
       run: |
         echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
+        codesign --verify --deep --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}" | exit 0
         spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
         codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
