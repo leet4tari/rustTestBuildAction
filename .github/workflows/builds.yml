@@ -131,7 +131,6 @@ jobs:
       shell: bash
       run: |
         echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --display --verbose=4 "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         spctl -a -v "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
         codesign --options runtime --force --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}/dist/${{ env.BINFILE }}"
