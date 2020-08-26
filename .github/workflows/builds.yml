@@ -18,9 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
+#        os: [ubuntu-18.04]
 #        os: [macos-latest]
-#        os: [ubuntu-18.04, windows-2019]
+        os: [ubuntu-18.04, windows-2019]
 #        os: [ubuntu-latest, macos-latest, windows-latest]
 #        os: [windows-latest, self-hosted]
         features: ["avx2", "safe"]
@@ -194,7 +194,8 @@ jobs:
       continue-on-error: true  # WARNING: only for this example, remove it!
 #      uses: shallwefootball/s3-upload-action@56a9b8f
 #      uses: shallwefootball/s3-upload-action@v1.1.2
-      uses: shallwefootball/s3-upload-action@master
+#      uses: shallwefootball/s3-upload-action@master
+      uses: shallwefootball/s3-upload-action@v1.1.1
       with:
         aws_bucket: ${{ secrets.AWS_S3_BUCKET }}
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
