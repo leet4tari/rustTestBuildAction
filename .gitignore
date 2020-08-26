@@ -11,3 +11,6 @@ Cargo.lock
 
 # Local include env
 .env
+
+# OSX stuff
+.DS_Store
