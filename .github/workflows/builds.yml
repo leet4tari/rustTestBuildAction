@@ -183,7 +183,8 @@ jobs:
       run: |
         echo "Starting upload ..."
         aws --debug s3 ${{ env.S3CMD }} --region ${{ secrets.AWS_REGION }} \
-          ${{ env.S3OPTIONS }} ${{ env.SOURCE }} \
+          ${{ env.S3OPTIONS }} \
+          ${{ env.SOURCE }} \
           s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }}
         echo "Done!"
       env:
