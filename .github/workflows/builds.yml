@@ -180,16 +180,16 @@ jobs:
     - name: Sync dist to S3 - Bash
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
-        aws s3 ${{ env.S3CMD }} --region '${{ secrets.AWS_REGION }}' \
+        aws s3 ${{ env.S3CMD }} --region ${{ secrets.AWS_REGION }} \
           ${{ env.S3OPTIONS }} ${{ env.SOURCE }} \
           s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        SOURCE: ${{ github.workspace }}/dist/*.zip*
+        SOURCE: ${{ github.workspace }}/dist/
         DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
         S3CMD: 'cp'
-        S3OPTIONS: ' '
+        S3OPTIONS: ' --exclude "*" --include "*.zip*" '
 #        S3OPTIONS: '--acl public-read'
 #        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 #        AWS_REGION: '${{ secrets.AWS_REGION }}'
