@@ -35,6 +35,12 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
+    - name: Declare some variables
+      id: vars
+      shell: bash
+      run: |
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
     - name: Setup Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -123,8 +129,12 @@ jobs:
         cd "$GITHUB_WORKSPACE${TBN_DIST}"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
         VERSION="v0.1.0"
+        echo "Branch: ${{ steps.vars.outputs.branch }}"
+        echo "Sha: ${{ steps.vars.outputs.sha_short }}"
         echo ::set-env name=VERSION::${VERSION}
-        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
+#        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
+#       <bin name>_<version>_<commit?>_<specifics>
+        BINFILE="${TBN_FILENAME}-${VERSION}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
         echo ::set-env name=BINFILE::${BINFILE}
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
@@ -176,7 +186,7 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.TBN_FILENAME }} - ${{ env.VERSION  }} - release - ${{ matrix.os }} ${{ matrix.target_cpu }} ${{ matrix.features }}
+        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
         path: '${{ github.workspace }}${{ env.TBN_DIST }}/${{ env.BINFILE }}.zip*'
 
     - name: Sync dist to S3 - Bash
