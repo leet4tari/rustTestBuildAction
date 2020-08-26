@@ -20,8 +20,8 @@ jobs:
       matrix:
 #        os: [ubuntu-18.04]
 #        os: [macos-latest]
-        os: [ubuntu-18.04, windows-2019]
-#        os: [ubuntu-latest, macos-latest, windows-latest]
+#        os: [ubuntu-18.04, windows-2019]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 #        os: [windows-latest, self-hosted]
         features: ["avx2", "safe"]
 #        target_cpu: ["x86-64", "ivybridge", "skylake"]
@@ -179,7 +179,7 @@ jobs:
     - name: Sync dist to S3 - Bash
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
-        aws s3 $${{ env.S3CMD }} --region '${{ secrets.AWS_REGION }}' \
+        aws s3 ${{ env.S3CMD }} --region '${{ secrets.AWS_REGION }}' \
         ${{ env.S3OPTIONS }} '${{ env.SOURCE }}' \
         s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }}
       env:
