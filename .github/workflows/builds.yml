@@ -132,8 +132,8 @@ jobs:
         echo "Branch: ${{ steps.vars.outputs.branch }}"
         echo "Sha: ${{ steps.vars.outputs.sha_short }}"
         echo ::set-env name=VERSION::${VERSION}
-#        BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
-#       <bin name>_<version>_<commit?>_<specifics>
+        # BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
+        # <bin name>_<version>_<commit?>_<specifics>
         BINFILE="${TBN_FILENAME}-${VERSION}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
         echo ::set-env name=BINFILE::${BINFILE}
         echo "Copying file ${BINFILE} too $(pwd)"
