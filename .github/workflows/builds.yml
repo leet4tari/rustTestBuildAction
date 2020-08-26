@@ -182,11 +182,11 @@ jobs:
       shell: bash
       run: |
         echo "Starting upload ..."
-        aws s3 ${{ env.S3CMD }} --region ${{ secrets.AWS_REGION }} \
+        aws --deebug s3 ${{ env.S3CMD }} --region ${{ secrets.AWS_REGION }} \
           ${{ env.SOURCE }} \
           s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }} \
           ${{ env.S3OPTIONS }}
-        echo "Done!"
+        echo "$? - Done!"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
