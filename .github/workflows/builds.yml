@@ -176,30 +176,19 @@ jobs:
         name: ${{ env.TBN_FILENAME }} - ${{ env.VERSION  }} - release - ${{ matrix.os }} ${{ matrix.target_cpu }} ${{ matrix.features }}
         path: '${{ github.workspace }}/dist/${{ env.BINFILE }}.zip*'
 
-    - name: Sync dist to S3 - Nix
+    - name: Sync dist to S3 - Bash
       continue-on-error: true  # WARNING: only for this example, remove it!
-#      uses: jakejarvis/s3-sync-action@be0c4ab
-#      with:
-#        args: --acl public-read --follow-symlinks
-      uses: jakejarvis/s3-sync-action@v0.5.1
+       run: |
+          aws s3 $${{ env.S3CMD }} --region '${{ secrets.AWS_REGION }}' \
+          ${{ env.S3OPTIONS }} '${{ env.SOURCE }}' \
+          s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }}
       env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+#        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: '${{ secrets.AWS_REGION }}'
-        SOURCE_DIR: '${{ github.workspace }}/dist/'
-        DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
-
-    - name: Sync dist to S3 - Other
-      continue-on-error: true  # WARNING: only for this example, remove it!
-#      uses: shallwefootball/s3-upload-action@56a9b8f
-#      uses: shallwefootball/s3-upload-action@v1.1.2
-#      uses: shallwefootball/s3-upload-action@master
-      uses: shallwefootball/s3-upload-action@v0.0.12
-      with:
-        aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_bucket: ${{ secrets.AWS_S3_BUCKET }}
-        source_dir: '${{ github.workspace }}/dist/'
-        destination_dir: '/test/${{ env.S3DESTDIR }}/'
 #        AWS_REGION: '${{ secrets.AWS_REGION }}'
+        SOURCE: '${{ github.workspace }}/dist/*.zip*'
+        DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
+        S3CMD: 'cp'
+        S3OPTIONS: ''
+#        S3OPTIONS: '--acl public-read'
