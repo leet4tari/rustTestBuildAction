@@ -193,7 +193,8 @@ jobs:
         SOURCE: ${{ github.workspace }}/dist/
         DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
         S3CMD: 'cp'
-        S3OPTIONS: '--exclude "*" --include "*.zip*"'
+        S3OPTIONS: '--recursive'
+#        S3OPTIONS: '--recursive --exclude "*" --include "*.zip*"'
 #        S3OPTIONS: '--acl public-read'
 #        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 #        AWS_REGION: '${{ secrets.AWS_REGION }}'
