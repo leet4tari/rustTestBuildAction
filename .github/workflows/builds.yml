@@ -187,8 +187,8 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: '${{ secrets.AWS_REGION }}'
-        SOURCE_DIR: '${{ github.workspace }}/dist/${{ env.BINFILE }}.zip*'
-        DEST_DIR: '/test/${{ env.S3DESTDIR }}'
+        SOURCE_DIR: '${{ github.workspace }}/dist/'
+        DEST_DIR: '/test/${{ env.S3DESTDIR }}/'
 
     - name: Sync dist to S3 - Other
       continue-on-error: true  # WARNING: only for this example, remove it!
@@ -198,6 +198,6 @@ jobs:
         aws_bucket: ${{ secrets.AWS_S3_BUCKET }}
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source_dir: '${{ github.workspace }}/dist/${{ env.BINFILE }}.zip*'
-        destination_dir: '/test/${{ env.S3DESTDIR }}'
+        source_dir: '${{ github.workspace }}/dist/'
+        destination_dir: '/test/${{ env.S3DESTDIR }}/'
 #        AWS_REGION: '${{ secrets.AWS_REGION }}'
