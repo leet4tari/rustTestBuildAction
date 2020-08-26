@@ -18,10 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        os: [ubuntu-18.04]
+        os: [ubuntu-18.04]
 #        os: [macos-latest]
 #        os: [ubuntu-18.04, windows-2019]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+#        os: [ubuntu-latest, macos-latest, windows-latest]
 #        os: [windows-latest, self-hosted]
         features: ["avx2", "safe"]
 #        target_cpu: ["x86-64", "ivybridge", "skylake"]
@@ -168,6 +168,7 @@ jobs:
         echo "Verifications is "
         ${SHARUN} --check "${{ env.BINFILE }}.zip.sha256"
         ls -la
+        pwd
 #        printenv
 
     - name: Upload binary
@@ -180,12 +181,12 @@ jobs:
       continue-on-error: true  # WARNING: only for this example, remove it!
       run: |
         aws s3 ${{ env.S3CMD }} --region '${{ secrets.AWS_REGION }}' \
-        ${{ env.S3OPTIONS }} '${{ env.SOURCE }}' \
+        ${{ env.S3OPTIONS }} "${{ env.SOURCE }}" \
         s3://${{ secrets.AWS_S3_BUCKET }}/${{ env.DEST_DIR }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        SOURCE: '${{ github.workspace }}/dist/*.zip*'
+        SOURCE: "${{ github.workspace }}/dist/*.zip*"
         DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
         S3CMD: 'cp'
         S3OPTIONS: ''
