@@ -178,7 +178,8 @@ jobs:
 
     - name: Sync dist to S3 - Nix
       continue-on-error: true  # WARNING: only for this example, remove it!
-      uses: jakejarvis/s3-sync-action@be0c4ab
+#      uses: jakejarvis/s3-sync-action@be0c4ab
+      uses: jakejarvis/s3-sync-action@v0.5.1
       with:
         args: --acl public-read --follow-symlinks
       env:
@@ -191,7 +192,8 @@ jobs:
 
     - name: Sync dist to S3 - Other
       continue-on-error: true  # WARNING: only for this example, remove it!
-      uses: shallwefootball/s3-upload-action@56a9b8f
+#      uses: shallwefootball/s3-upload-action@56a9b8f
+      uses: shallwefootball/s3-upload-action@v1.1.2
       with:
         aws_bucket: ${{ secrets.AWS_S3_BUCKET }}
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
