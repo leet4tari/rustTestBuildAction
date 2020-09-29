@@ -49,6 +49,7 @@ jobs:
         echo "Event: ${{ github.event }}"
         echo "Actions: ${GITHUB_ACTIONS}"
         echo "Actor: ${GITHUB_ACTOR}"
+        echo "Date: $(date)"
     - name: Declare some variables
       id: vars
       shell: bash
