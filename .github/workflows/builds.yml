@@ -1,4 +1,4 @@
-name: Multi Platform Builder - Test - ${{ github.event_name }}
+name: Multi Platform Builder - Test
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
-    - name: Declare some variables
+    - name: Declare some variables - ${{ github.event_name }}
       id: vars
       shell: bash
       run: |
@@ -54,13 +54,13 @@ jobs:
       if: github.event_name == 'schedule' && github.event.schedule != '0 0 * * *'
       run: echo "This step will be skipped every 24 hours"
     - name: Default Destination Folder
-      uses: allenevans/set-env@v1.0.0
+      uses: allenevans/set-env@v1.1.0
       with:
         overwrite: true
         S3DESTOVERRIDE: ''
     - name: Scheduled Destination Folder Override
-      if: github.event_name == 'schedule' && github.event.schedule != '*/30 * * * *'
-      uses: allenevans/set-env@v1.0.0
+      if: github.event_name == 'schedule'
+      uses: allenevans/set-env@v1.1.0
       with:
         overwrite: true
         S3DESTOVERRIDE: 'daily/'
