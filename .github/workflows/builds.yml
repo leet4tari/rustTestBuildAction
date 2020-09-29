@@ -1,4 +1,4 @@
-name: Multi Platform Builder - Test
+name: Multi Platform Builder - Test - ${{ github.event_name }}
 
 on:
   push:
