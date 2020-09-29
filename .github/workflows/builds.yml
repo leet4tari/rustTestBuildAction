@@ -47,6 +47,8 @@ jobs:
       run: |
         echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        echo "Event_Name: ${{ github.event_name }}"
+        echo "Event.Schedule: ${{ github.event.schedule }}"
     - name: Skip this step every 24 hours
       id: vars-skip
       if: github.event_name == 'schedule' && github.event.schedule != '0 0 * * *'
