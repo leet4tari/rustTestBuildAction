@@ -1,6 +1,11 @@
 name: Multi Platform Builder - Test
 
-on: push
+on:
+  push:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+#    - cron:  '15 01 * * WED'
+    - cron:  '15 * * * *'
 
 env:
 #  target_cpu: "x86-64"
@@ -35,6 +40,15 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
+    - name: Check for Schedule
+      id: schedules
+      shell: bash
+      run: |
+        echo "Schedule Testing ..."
+        echo "Event_Name: ${{ github.event_name }}"
+        echo "Event: ${{ github.event }}"
+        echo "Actions: ${GITHUB_ACTIONS}"
+        echo "Actor: ${GITHUB_ACTOR}"
     - name: Declare some variables
       id: vars
       shell: bash
