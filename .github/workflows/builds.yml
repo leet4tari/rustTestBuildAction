@@ -41,22 +41,28 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
-    - name: Check for Schedule
-      id: schedules
-      shell: bash
-      run: |
-        echo "Schedule Testing ..."
-        echo "Event_Name: ${{ github.event_name }}"
-#        echo "Event: ${{ github.event }}"
-#        echo "Actions: ${GITHUB_ACTIONS}"
-#        echo "Actor: ${GITHUB_ACTOR}"
-#        echo "Date: $(date)"
     - name: Declare some variables
       id: vars
       shell: bash
       run: |
         echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    - name: Skip this step every 24 hours
+      id: vars-skip
+      if: github.event_name == 'schedule' && github.event.schedule != '0 0 * * *'
+      run: echo "This step will be skipped every 24 hours"
+    - name: Default Destination Folder
+      uses: allenevans/set-env@v1.0.0
+      with:
+        overwrite: true
+        S3DESTOVERRIDE: ''
+    - name: Scheduled Destination Folder Override
+      if: github.event_name == 'schedule' && github.event.schedule != '*/30 * * * *'
+      uses: allenevans/set-env@v1.0.0
+      with:
+        overwrite: true
+        S3DESTOVERRIDE: 'daily/'
+
     - name: Setup Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -219,7 +225,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE: '${{ github.workspace }}${{ env.TBN_DIST }}'
-        DEST_DIR: 'test/${{ env.S3DESTDIR }}/'
+        DEST_DIR: 'test/${{ env.S3DESTOVERRIDE }}${{ env.S3DESTDIR }}/'
         S3CMD: 'cp'
         S3OPTIONS: '--recursive'
 #        S3OPTIONS: '--recursive --exclude "*" --include "*.zip*"'
