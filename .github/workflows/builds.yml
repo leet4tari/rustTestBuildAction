@@ -65,7 +65,7 @@ jobs:
 
     - name: Default Destination Folder
       run: |
-        echo "S3DESTOVERRIDE=''" >> $GITHUB_ENV
+        echo "S3DESTOVERRIDE=" >> $GITHUB_ENV
 
     - name: Scheduled Destination Folder Override
       if: ${{ github.event_name == 'schedule' }}
@@ -85,9 +85,11 @@ jobs:
     - name: Install Linux dependencies
       if: startsWith(matrix.os,'ubuntu')
       run: sudo apt-get install zip
+
     - name: Install macOS dependencies
       if: startsWith(matrix.os,'macos')
       run: brew install p7zip cmake
+
     - name: Install Windows dependencies
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'windows')
@@ -101,26 +103,27 @@ jobs:
       if: "!startsWith(matrix.os,'Windows')"
       run: |
         #echo "SHARUN='shasum --portable --algorithm 256'"  >> $GITHUB_ENV
-        echo "SHARUN='shasum --algorithm 256'" >> $GITHUB_ENV
+        echo "SHARUN=shasum --algorithm 256" >> $GITHUB_ENV
         echo "CC=gcc" >> $GITHUB_ENV
         echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
         echo "TBN_EXT=" >> $GITHUB_ENV
         echo "S3DESTDIR=linux" >> $GITHUB_ENV
         echo "TBN_DIST=/dist" >> $GITHUB_ENV
+
     - name: Set environment variables - macOS
       if: startsWith(matrix.os,'macos')
       run: |
-        echo "S3DESTDIR='osx'" >> $GITHUB_ENV
+        echo "S3DESTDIR=osx" >> $GITHUB_ENV
+
     - name: Set environment variables - Windows
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'Windows')
       run: |
-        #echo "SHARUN='pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --portable --algorithm 256'" >> $GITHUB_ENV
-        echo "SHARUN='pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256'" >> $GITHUB_ENV
-        echo "TBN_FILENAME='cross-compile-sample'" >> $GITHUB_ENV
-        echo "TBN_EXT='.exe'" >> $GITHUB_ENV
-        echo "TBN_DIST='\dist'" >> $GITHUB_ENV
-        echo "S3DESTDIR='windows'" >> $GITHUB_ENV
+        echo "SHARUN=pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256" >> $GITHUB_ENV
+        echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
+        echo "TBN_EXT=.exe" >> $GITHUB_ENV
+        echo "TBN_DIST=\dist" >> $GITHUB_ENV
+        echo "S3DESTDIR=windows" >> $GITHUB_ENV
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
 #        RUSTFLAGS: '-C target_cpu=${{ target_cpu }}'
@@ -160,9 +163,9 @@ jobs:
         # BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
         # <bin name>_<version>_<commit?>_<specifics>
         BINFILE="${TBN_FILENAME}-${VERSION}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
-        echo "BINFILE=${BINFILE}" >> $GITHUB_ENV
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
+        echo "BINFILE=${BINFILE}" >> $GITHUB_ENV
 
     - name: Import macOS Certs
       if: startsWith(matrix.os,'macos')
