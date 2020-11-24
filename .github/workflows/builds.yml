@@ -11,7 +11,7 @@ on:
 env:
 #  target_cpu: "x86-64"
 #  RUSTFLAGS: "-C target_cpu=x86-64"
-  features: "safe"
+#  features: "safe"
 #  TBN_FILENAME: 'tari_base_node'
 #  SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #  VCPKGRS_DYNAMIC: 1
@@ -29,10 +29,15 @@ jobs:
 #        os: [ubuntu-18.04, windows-2019]
 #        os: [ubuntu-latest, macos-latest, windows-latest]
 #        os: [windows-latest, self-hosted]
-        features: ["avx2", "safe"]
-#        target_cpu: ["x86-64", "ivybridge", "skylake"]
-#        target_cpu: ["x86-64", "ivybridge"]
-        target_cpu: ["x86-64"]
+#        os: [ubuntu-latest, macos-latest, windows-latest, self-hosted]
+#        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15, macos-11.0, windows-2016,windows-2019]
+        # rustc --print target-features
+        # features=+avx2,+fma?
+        features: ["safe", "avx2"]
+        # rustc --print target-list?
+        # rustc -C target-cpu=help
+#        target_cpu: ["x86-64", "ivybridge", "skylake", "skylake-avx512"]
+        target_cpu: ["x86-64", "broadwell"]
         exclude:
           - target_cpu: "x86-64"
             features: "avx2"
@@ -53,17 +58,18 @@ jobs:
       id: vars-skip
       if: ${{ github.event_name == 'schedule' && github.event.schedule != '0 0 * * *' }}
       run: echo "This step will be skipped every 24 hours"
-    - name: Default Destination Folder
-      uses: allenevans/set-env@v1.1.0
-      with:
+#    - name: Default Destination Folder
+#      uses: allenevans/set-env@v1.1.0
+#      with:
 #        overwrite: true
-        S3DESTOVERRIDE: ''
+#        S3DESTOVERRIDE: ''
+    - name: Default Destination Folder
+      run: |
+        echo "S3DESTOVERRIDE=''" >> $GITHUB_ENV
     - name: Scheduled Destination Folder Override
       if: ${{ github.event_name == 'schedule' }}
-      uses: allenevans/set-env@v1.1.0
-      with:
-#        overwrite: true
-        S3DESTOVERRIDE: 'daily/'
+      run: |
+        echo "S3DESTOVERRIDE='daily/'" >> $GITHUB_ENV
 
     - name: Setup Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -92,34 +98,28 @@ jobs:
     - name: set environment variables - Nix
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: "!startsWith(matrix.os,'Windows')"
-      uses: allenevans/set-env@v1.0.0
-      with:
-        overwrite: true
-#        SHARUN: 'shasum --portable --algorithm 256'
-        SHARUN: 'shasum --algorithm 256'
-        CC: gcc
-        TBN_FILENAME: 'cross-compile-sample'
-        TBN_EXT: ''
-        S3DESTDIR: 'linux'
-        TBN_DIST: '/dist'
+      run: |
+        #echo "SHARUN='shasum --portable --algorithm 256'"  >> $GITHUB_ENV
+        echo "SHARUN='shasum --algorithm 256'" >> $GITHUB_ENV
+        echo "CC=gcc" >> $GITHUB_ENV
+        echo "TBN_FILENAME='cross-compile-sample'" >> $GITHUB_ENV
+        echo "TBN_EXT=''" >> $GITHUB_ENV
+        echo "S3DESTDIR='linux'" >> $GITHUB_ENV
+        echo "TBN_DIST='/dist'" >> $GITHUB_ENV
     - name: Set environment variables - macOS
       if: startsWith(matrix.os,'macos')
-      uses: allenevans/set-env@v1.0.0
-      with:
-        overwrite: true
-        S3DESTDIR: 'osx'
+      run: |
+        echo "S3DESTDIR='osx'" >> $GITHUB_ENV
     - name: set environment variables - Windows
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'Windows')
-      uses: allenevans/set-env@v1.0.0
-      with:
-        overwrite: true
-#        SHARUN: 'pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --portable --algorithm 256'
-        SHARUN: 'pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256'
-        TBN_FILENAME: 'cross-compile-sample'
-        TBN_EXT: '.exe'
-        TBN_DIST: '\dist'
-        S3DESTDIR: 'windows'
+      run: |
+        #echo "SHARUN='pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --portable --algorithm 256'" >> $GITHUB_ENV
+        echo "SHARUN='pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256'" >> $GITHUB_ENV
+        echo "TBN_FILENAME='cross-compile-sample'" >> $GITHUB_ENV
+        echo "TBN_EXT='.exe'" >> $GITHUB_ENV
+        echo "TBN_DIST='\dist'" >> $GITHUB_ENV
+        echo "S3DESTDIR='windows'" >> $GITHUB_ENV
 #        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
 #        RUSTFLAGS: '-C target_cpu=${{ target_cpu }}'
@@ -155,11 +155,11 @@ jobs:
         VERSION="v0.1.0"
         echo "Branch: ${{ steps.vars.outputs.branch }}"
         echo "Sha: ${{ steps.vars.outputs.sha_short }}"
-        echo ::set-env name=VERSION::${VERSION}
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
         # BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
         # <bin name>_<version>_<commit?>_<specifics>
         BINFILE="${TBN_FILENAME}-${VERSION}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
-        echo ::set-env name=BINFILE::${BINFILE}
+        echo "BINFILE=${BINFILE}" >> $GITHUB_ENV
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
 
