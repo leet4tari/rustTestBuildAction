@@ -7,6 +7,14 @@ on:
     - cron:  '15 01 * * WED'
 #    - cron:  '15 * * * *'
 #    - cron:  '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
 
 #env:
 #  target_cpu: "x86-64"
@@ -60,6 +68,8 @@ jobs:
         #echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         echo "Event_Name: ${{ github.event_name }}"
         echo "Event.Schedule: ${{ github.event.schedule }}"
+        echo "Log level: ${{ github.event.inputs.logLevel }}"
+        echo "Tags: ${{ github.event.inputs.tags }}"
 
     - name: Skip this step every 24 hours
       id: vars-skip
