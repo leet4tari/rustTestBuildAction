@@ -33,11 +33,13 @@ jobs:
 #        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15, macos-11.0, windows-2016,windows-2019]
         # rustc --print target-features
         # features=+avx2,+fma?
-        features: ["safe", "avx2"]
+#        features: ["safe", "avx2"]
+        features: ["safe"]
         # rustc --print target-list?
         # rustc -C target-cpu=help
 #        target_cpu: ["x86-64", "ivybridge", "skylake", "skylake-avx512"]
-        target_cpu: ["x86-64", "broadwell"]
+#        target_cpu: ["x86-64", "broadwell"]
+        target_cpu: ["x86-64"]
         exclude:
           - target_cpu: "x86-64"
             features: "avx2"
@@ -46,6 +48,7 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
+
     - name: Declare some variables 4 GHA ${{ github.event_name }}
       id: vars
       shell: bash
@@ -54,18 +57,16 @@ jobs:
         echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         echo "Event_Name: ${{ github.event_name }}"
         echo "Event.Schedule: ${{ github.event.schedule }}"
+
     - name: Skip this step every 24 hours
       id: vars-skip
       if: ${{ github.event_name == 'schedule' && github.event.schedule != '0 0 * * *' }}
       run: echo "This step will be skipped every 24 hours"
-#    - name: Default Destination Folder
-#      uses: allenevans/set-env@v1.1.0
-#      with:
-#        overwrite: true
-#        S3DESTOVERRIDE: ''
+
     - name: Default Destination Folder
       run: |
         echo "S3DESTOVERRIDE=''" >> $GITHUB_ENV
+
     - name: Scheduled Destination Folder Override
       if: ${{ github.event_name == 'schedule' }}
       run: |
@@ -95,22 +96,22 @@ jobs:
         dir 'C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master'
         C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 -h
 
-    - name: set environment variables - Nix
+    - name: Set environment variables - Nix
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: "!startsWith(matrix.os,'Windows')"
       run: |
         #echo "SHARUN='shasum --portable --algorithm 256'"  >> $GITHUB_ENV
         echo "SHARUN='shasum --algorithm 256'" >> $GITHUB_ENV
         echo "CC=gcc" >> $GITHUB_ENV
-        echo "TBN_FILENAME='cross-compile-sample'" >> $GITHUB_ENV
-        echo "TBN_EXT=''" >> $GITHUB_ENV
-        echo "S3DESTDIR='linux'" >> $GITHUB_ENV
-        echo "TBN_DIST='/dist'" >> $GITHUB_ENV
+        echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
+        echo "TBN_EXT=" >> $GITHUB_ENV
+        echo "S3DESTDIR=linux" >> $GITHUB_ENV
+        echo "TBN_DIST=/dist" >> $GITHUB_ENV
     - name: Set environment variables - macOS
       if: startsWith(matrix.os,'macos')
       run: |
         echo "S3DESTDIR='osx'" >> $GITHUB_ENV
-    - name: set environment variables - Windows
+    - name: Set environment variables - Windows
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'Windows')
       run: |
