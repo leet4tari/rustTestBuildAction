@@ -100,7 +100,8 @@ jobs:
 
     - name: Install macOS dependencies
       if: startsWith(matrix.os,'macos')
-      run: brew install p7zip cmake
+      run: echo "All OSX deps installed"
+#      run: brew install p7zip cmake
 
     - name: Install Windows dependencies
       continue-on-error: true  # WARNING: only for this example, remove it!
@@ -239,6 +240,7 @@ jobs:
         #echo "Post Verify signed OSX Binary - ${{ env.BINFILE }} ..."
         #codesign --display --verbose=4 --verify --check-notarization --deep "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}" | exit 0
         #spctl --assess --verbose "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}" | exit 0
+        exit 0
 
     - name: Archive and Sign Binaries
       continue-on-error: true  # WARNING: only for this example, remove it!
@@ -259,7 +261,7 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${VSHA_SHORT}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
+        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${{ env.VSHA_SHORT }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
         path: '${{ github.workspace }}${{ env.TBN_DIST }}/${{ env.BINFILE }}.zip*'
 
     - name: Sync dist to S3 - Bash
