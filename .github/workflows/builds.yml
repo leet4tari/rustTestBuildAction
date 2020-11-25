@@ -16,7 +16,8 @@ on:
       tags:
         description: 'Test scenario tags'
 
-#env:
+env:
+  TBN_FILENAME: cross-compile-sample
 #  target_cpu: "x86-64"
 #  RUSTFLAGS: "-C target_cpu=x86-64"
 #  features: "safe"
@@ -64,8 +65,6 @@ jobs:
       run: |
         echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
         echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-        #echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        #echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         echo "Event_Name: ${{ github.event_name }}"
         echo "Event.Schedule: ${{ github.event.schedule }}"
         echo "Log level: ${{ github.event.inputs.logLevel }}"
@@ -83,7 +82,7 @@ jobs:
     - name: Scheduled Destination Folder Override
       if: ${{ github.event_name == 'schedule' }}
       run: |
-        echo "S3DESTOVERRIDE='daily/'" >> $GITHUB_ENV
+        echo "S3DESTOVERRIDE=daily/" >> $GITHUB_ENV
 
     - name: Setup Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -97,7 +96,7 @@ jobs:
     # Install OS specific dependencies
     - name: Install Linux dependencies
       if: startsWith(matrix.os,'ubuntu')
-      run: sudo apt-get install zip
+      run: sudo apt-get -y install zip
 
     - name: Install macOS dependencies
       if: startsWith(matrix.os,'macos')
@@ -107,7 +106,7 @@ jobs:
       continue-on-error: true  # WARNING: only for this example, remove it!
       if: startsWith(matrix.os,'windows')
       run: |
-        choco upgrade zip psutils -y
+        choco upgrade llvm zip psutils openssl -y
         dir 'C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master'
         C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 -h
 
@@ -134,14 +133,43 @@ jobs:
       shell: bash
       run: |
         echo "SHARUN=pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256" >> $GITHUB_ENV
-        echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
+        #echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
         echo "TBN_EXT=.exe" >> $GITHUB_ENV
         echo "TBN_DIST=\dist" >> $GITHUB_ENV
         echo "S3DESTDIR=windows" >> $GITHUB_ENV
-#        SQLITE3_LIB_DIR: 'C:\vcpkg\installed\x64-windows\lib'
+        echo "SQLITE3_LIB_DIR=C:\vcpkg\installed\x64-windows\lib" >> $GITHUB_ENV
+        echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
+        echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $GITHUB_ENV
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
 #        RUSTFLAGS: '-C target_cpu=${{ target_cpu }}'
 #        CC: gcc
+
+    - name: Get rust version
+      id: rust-version
+      shell: bash
+      run: echo "RVersion=$(rustc --version)" >> $GITHUB_ENV
+
+    - name: Cache cargo index
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/registry/index
+        key: index-${{ runner.os }}-${{ github.run_number }}
+        restore-keys: |
+          index-${{ runner.os }}-
+    - name: Create lockfile
+      run: cargo generate-lockfile
+    - name: Cache cargo registry
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/registry/cache
+        key: registry-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
+    - name: Fetch dependencies
+      run: cargo fetch
+    - name: Cache target directory
+      uses: actions/cache@v2
+      with:
+        path: target
+        key: target-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
 
     - name: Build binaries
       uses: actions-rs/cargo@v1
@@ -152,8 +180,8 @@ jobs:
       with:
 #        use-cross: true
         command: build
-#        args: --release --features ${{ matrix.features }}
-        args: --release
+        args: --release --features ${{ matrix.features }}
+#        args: --release
 
     - shell: bash
 #      continue-on-error: true  # WARNING: only for this example, remove it!
