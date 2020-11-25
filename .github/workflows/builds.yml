@@ -140,14 +140,16 @@ jobs:
         echo "SQLITE3_LIB_DIR=C:\vcpkg\installed\x64-windows\lib" >> $GITHUB_ENV
         echo "OPENSSL_DIR=C:\Program Files\OpenSSL-Win64" >> $GITHUB_ENV
         echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $GITHUB_ENV
+
 #        RUSTFLAGS: '-Ctarget-feature=+crt-static'
 #        RUSTFLAGS: '-C target_cpu=${{ target_cpu }}'
 #        CC: gcc
 
     - name: Get rust version
       id: rust-version
-      shell: bash
-      run: echo "RVersion=$(rustc --version)" >> $GITHUB_ENV
+      run: echo "::set-output name=version::$(rustc --version)"
+#      shell: bash
+#      run: echo "RVersion=$(rustc --version)" >> $GITHUB_ENV
 
     - name: Cache cargo index
       uses: actions/cache@v2
@@ -162,14 +164,16 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cargo/registry/cache
-        key: registry-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
+        key: registry-${{ runner.os }}-${{ steps.rust-version.outputs.version }}-${{ hashFiles('Cargo.lock') }}
+#        key: registry-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
     - name: Fetch dependencies
       run: cargo fetch
     - name: Cache target directory
       uses: actions/cache@v2
       with:
         path: target
-        key: target-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
+        key: target-${{ runner.os }}-${{ steps.rust-version.outputs.version }}-${{ hashFiles('Cargo.lock') }}
+#        key: target-${{ runner.os }}-${RVersion}-${{ hashFiles('Cargo.lock') }}
 
     - name: Build binaries
       uses: actions-rs/cargo@v1
