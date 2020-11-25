@@ -37,10 +37,10 @@ jobs:
 #        os: [ubuntu-18.04]
 #        os: [macos-latest]
 #        os: [ubuntu-18.04, windows-2019]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+#        os: [ubuntu-latest, macos-latest, windows-latest]
 #        os: [windows-latest, self-hosted]
 #        os: [ubuntu-latest, macos-latest, windows-latest, self-hosted]
-#        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15, macos-11.0, windows-2016, windows-2019]
+        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15, macos-11.0, windows-2016, windows-2019]
         # rustc --print target-features
         # features=+avx2,+fma?
         features: ["safe", "avx2"]
@@ -63,8 +63,8 @@ jobs:
       id: vars
       shell: bash
       run: |
-        echo "VBranch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-        echo "Vsha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "VBRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        echo "VSHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
         echo "Event_Name: ${{ github.event_name }}"
         echo "Event.Schedule: ${{ github.event.schedule }}"
         echo "Log level: ${{ github.event.inputs.logLevel }}"
@@ -117,7 +117,6 @@ jobs:
         #echo "SHARUN='shasum --portable --algorithm 256'"  >> $GITHUB_ENV
         echo "SHARUN=shasum --algorithm 256" >> $GITHUB_ENV
         echo "CC=gcc" >> $GITHUB_ENV
-        echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
         echo "TBN_EXT=" >> $GITHUB_ENV
         echo "S3DESTDIR=linux" >> $GITHUB_ENV
         echo "TBN_DIST=/dist" >> $GITHUB_ENV
@@ -133,7 +132,6 @@ jobs:
       shell: bash
       run: |
         echo "SHARUN=pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256" >> $GITHUB_ENV
-        #echo "TBN_FILENAME=cross-compile-sample" >> $GITHUB_ENV
         echo "TBN_EXT=.exe" >> $GITHUB_ENV
         echo "TBN_DIST=\dist" >> $GITHUB_ENV
         echo "S3DESTDIR=windows" >> $GITHUB_ENV
@@ -204,12 +202,12 @@ jobs:
         cd "$GITHUB_WORKSPACE${TBN_DIST}"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
         VERSION="v0.1.0"
-        echo "Branch: ${VBranch}"
-        echo "Sha: ${Vsha_short}"
+        echo "Branch: ${VBRANCH}"
+        echo "Sha: ${VSHA_SHORT}"
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
         # BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
         # <bin name>_<version>_<commit?>_<specifics>
-        BINFILE="${TBN_FILENAME}-${VERSION}-${Vsha_short}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
+        BINFILE="${TBN_FILENAME}-${VERSION}-${VSHA_SHORT}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
         echo "BINFILE=${BINFILE}" >> $GITHUB_ENV
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
@@ -261,7 +259,7 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${Vsha_short}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
+        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${VSHA_SHORT}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
         path: '${{ github.workspace }}${{ env.TBN_DIST }}/${{ env.BINFILE }}.zip*'
 
     - name: Sync dist to S3 - Bash
