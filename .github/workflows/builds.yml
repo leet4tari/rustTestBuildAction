@@ -234,9 +234,9 @@ jobs:
         # spctl --assess --type open --context context:primary-signature -v "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
         # xcrun stapler validate "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
         echo "Pre Verify signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --display --verbose=4 "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
+        #codesign --display --verbose=4 "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
         echo "Signed OSX Binary - ${{ env.BINFILE }} ..."
-        codesign --options runtime --force --timestamp --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
+        #codesign --options runtime --force --timestamp --verify --verbose --sign "${{ secrets.OSXSIGN }}" "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}"
         #echo "Post Verify signed OSX Binary - ${{ env.BINFILE }} ..."
         #codesign --display --verbose=4 --verify --check-notarization --deep "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}" | exit 0
         #spctl --assess --verbose "${GITHUB_WORKSPACE}${{ env.TBN_DIST }}/${{ env.BINFILE }}" | exit 0
