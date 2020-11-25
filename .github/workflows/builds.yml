@@ -63,8 +63,8 @@ jobs:
       id: vars
       shell: bash
       run: |
-        echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-        echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "VBranch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        echo "Vsha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
         echo "Event_Name: ${{ github.event_name }}"
         echo "Event.Schedule: ${{ github.event.schedule }}"
         echo "Log level: ${{ github.event.inputs.logLevel }}"
@@ -180,8 +180,9 @@ jobs:
       with:
 #        use-cross: true
         command: build
-        args: --release --features ${{ matrix.features }}
-#        args: --release
+#        args: --release --features ${{ matrix.features }}
+        args: --release
+# Need to Look at feature builds?
 
     - shell: bash
 #      continue-on-error: true  # WARNING: only for this example, remove it!
@@ -199,12 +200,12 @@ jobs:
         cd "$GITHUB_WORKSPACE${TBN_DIST}"
         #VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' "$GITHUB_WORKSPACE/applications/tari_base_node/Cargo.toml")
         VERSION="v0.1.0"
-        echo "Branch: ${{ steps.vars.outputs.branch }}"
-        echo "Sha: ${{ steps.vars.outputs.sha_short }}"
+        echo "Branch: ${VBranch}"
+        echo "Sha: ${Vsha_short}"
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
         # BINFILE="${TBN_FILENAME}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}-${VERSION}${TBN_EXT}"
         # <bin name>_<version>_<commit?>_<specifics>
-        BINFILE="${TBN_FILENAME}-${VERSION}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
+        BINFILE="${TBN_FILENAME}-${VERSION}-${Vsha_short}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}${TBN_EXT}"
         echo "BINFILE=${BINFILE}" >> $GITHUB_ENV
         echo "Copying file ${BINFILE} too $(pwd)"
         cp -v "$GITHUB_WORKSPACE/target/release/${TBN_FILENAME}${TBN_EXT}" "./${BINFILE}"
@@ -256,7 +257,7 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
+        name: ${{ env.TBN_FILENAME }}-${{ env.VERSION  }}-${Vsha_short}-${{ matrix.os }}-${{ matrix.target_cpu }}-${{ matrix.features }}
         path: '${{ github.workspace }}${{ env.TBN_DIST }}/${{ env.BINFILE }}.zip*'
 
     - name: Sync dist to S3 - Bash
