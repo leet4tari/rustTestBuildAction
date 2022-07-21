@@ -44,7 +44,8 @@ jobs:
     needs: matrix-prep
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+      matrix:
+        build: '${{ fromJson(needs.matrix-prep.outputs.matrix) }}'
     #runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
