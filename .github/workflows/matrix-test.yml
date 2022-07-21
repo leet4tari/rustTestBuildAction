@@ -62,6 +62,10 @@ jobs:
         run: |
           echo "${{ matrix.build }}"
           which jq
+          jq --version
+          ls -al .github/workflows/base_node_binaries.json
+          cat .github/workflows/base_node_binaries.json
+          jq -s -c .[] .github/workflows/base_node_binaries.json
           echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] \
             | select(."build"==$jsonVar)
             | to_entries[] | .key + "=" + ( .value | tostring )' \
