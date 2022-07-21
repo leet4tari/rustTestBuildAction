@@ -19,7 +19,7 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          matrix=$( cat .github/workflows/base_node_binaries.json | jq -c . )
+          matrix=$( cat .github/workflows/base_node_binaries.json | jq -s -c .[] )
           echo $matrix
           echo $matrix | jq .
           echo "::set-output name=matrix::$matrix"
@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: '${{ fromJson(needs.matrix-prep.outputs.matrix) }}'
+        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
     #runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
