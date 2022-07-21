@@ -58,9 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Testing
-        shell: base
+        shell: bash
         run: |
           echo "${{ matrix.build }}"
+          which jq
           echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] \
             | select(."build"==$jsonVar)
             | to_entries[] | .key + "=" + ( .value | tostring )' \
