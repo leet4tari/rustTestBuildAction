@@ -16,9 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - id: set-matrix
+      - name: Set Matrix
+        id: set-matrix
         run: |
-          matrix=$( cat .github/workflows/base_node_binaries.json )
+          matrix=$( cat .github/workflows/base_node_binaries.json | jq -c . )
           echo $matrix
           echo $matrix | jq .
           echo "::set-output name=matrix::$matrix"
