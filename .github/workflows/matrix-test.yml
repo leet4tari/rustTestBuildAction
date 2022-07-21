@@ -18,8 +18,6 @@ jobs:
 
       - id: set-matrix
         run: |
-          pwd
-          ls -la
           matrix=$( cat .github/workflows/base_node_binaries.json )
           echo $matrix
           echo $matrix | jq .
@@ -35,7 +33,7 @@ jobs:
 
       - name: Check matrix definition
         run: |
-          matrix='${{ needs.matrix.outputs.matrix }}'
+          matrix=${{ needs.matrix.outputs.matrix }}
           echo $matrix
           echo $matrix | jq .
           echo $matrix | json2yaml
