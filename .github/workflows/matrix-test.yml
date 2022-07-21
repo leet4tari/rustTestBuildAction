@@ -63,5 +63,5 @@ jobs:
           echo "${{ matrix.build }}"
           echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] \
             | select(."build"==$jsonVar)
-            | to_entries[] | .key + "=" + .value' \
+            | to_entries[] | .key + "=" + ( .value | tostring )' \
             .github/workflows/base_node_binaries.json )
