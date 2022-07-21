@@ -40,10 +40,11 @@ jobs:
           echo $matrix | json2yaml
 
   build:
+    name: Build ${{ matrix.build }} on ${{ matrix.os }}
     needs: matrix-prep
     strategy:
+      fail-fast: false
       matrix: ${{fromJson(needs.matrix-prep.outputs.matrix)}}
-    name: Build
     runs-on: ${{ matrix.os }}
     steps:
     - name: Echo
