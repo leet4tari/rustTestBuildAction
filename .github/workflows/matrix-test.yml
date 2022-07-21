@@ -44,10 +44,24 @@ jobs:
     needs: matrix-prep
     strategy:
       fail-fast: false
+#      matrix:
+#        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
       matrix:
-        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+        build:
+          [
+            linux-x86_64, linux-arm64,
+          ]
+#            linux-x86_64, linux-arm64,
+#            macos-x86_64, macos-arm64,
+#            windows-x64, windows-arm64,
     #runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
-      - name: Echo
-        run: echo "${{ matrix.build }}"
+      - name: Testing
+        shell: base
+        run: |
+          echo "${{ matrix.build }}"
+          echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] \
+            | select(."build"==$jsonVar)
+            | to_entries[] | .key + "=" + .value' \
+            .github/workflows/base_node_binaries.json )
