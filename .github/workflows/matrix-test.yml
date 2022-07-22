@@ -71,6 +71,12 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
 
+      - name: Dump matrix builds context
+        continue-on-error: true
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix.builds) }}
+        run: echo "$MATRIX_CONTEXT"
+
       - name: Dump matrix context Builds OS
         continue-on-error: true
         env:
