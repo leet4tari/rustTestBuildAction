@@ -45,7 +45,7 @@ jobs:
     needs: matrix-prep
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix).build }}
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
 #      matrix:
 #        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
 #      matrix:
@@ -76,3 +76,5 @@ jobs:
           cat .github/workflows/base_node_binaries.json
           jq -s -c .[] .github/workflows/base_node_binaries.json
           echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] | select(."build"==$jsonVar) | to_entries[] | .key + "=" + ( .value | tostring )' .github/workflows/base_node_binaries.json )
+          echo ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+          echo ${{ fromJson(needs.matrix-prep.outputs.matrix).build }}
