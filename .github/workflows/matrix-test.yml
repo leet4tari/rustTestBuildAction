@@ -59,6 +59,7 @@ jobs:
     #runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
+    continue-on-error: true
       - uses: actions/checkout@v2
 
 #      - name: Dump matrix
@@ -77,17 +78,17 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix.builds) }}
         run: echo "$MATRIX_CONTEXT"
 
-      - name: Dump matrix context Builds OS
+      - name: Dump matrix builds os context
         continue-on-error: true
         env:
-          MATRIX_CONTEXT_OS: ${{ fromJson(matrix).builds.os }}
-        run: echo "$MATRIX_CONTEXT_OS"
+          MATRIX_CONTEXT: ${{ toJson(matrix.builds.os) }}
+        run: echo "$MATRIX_CONTEXT"
 
-      - name: Dump matrix context OS
+      - name: Dump matrix builds target_cpu context
         continue-on-error: true
         env:
-          MATRIX_CONTEXT_OS: ${{ fromJson(matrix.builds).os }}
-        run: echo "$MATRIX_CONTEXT_OS"
+          MATRIX_CONTEXT: ${{ toJson(matrix.builds.target_cpu) }}
+        run: echo "$MATRIX_CONTEXT"
 
       - name: Testing
         continue-on-error: true

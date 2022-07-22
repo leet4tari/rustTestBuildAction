@@ -2,11 +2,23 @@
   "builds": [
     {
       "name": "linux-x86",
-      "os": "ubuntu-18.04"
+      "os": "ubuntu-18.04",
+      "target_cpu": "x86-64"
     },
     {
       "name": "linux-arm64",
-      "os": "ubuntu-18.04"
+      "os": "ubuntu-18.04",
+      "target_cpu": "generic"
+    },
+    {
+      "name": "macos-x86",
+      "os": "ubuntu-18.04",
+      "target_cpu": "x86-64"
+    },
+    {
+      "name": "macos-arm64",
+      "os": "ubuntu-18.04",
+      "target_cpu": "generic"
     }
   ]
 }
