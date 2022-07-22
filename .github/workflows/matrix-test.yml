@@ -45,8 +45,9 @@ jobs:
     needs: matrix-prep
     strategy:
       fail-fast: false
-      matrix:
-        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+#      matrix:
+#        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
 #      matrix:
 #        build:
 #          [
