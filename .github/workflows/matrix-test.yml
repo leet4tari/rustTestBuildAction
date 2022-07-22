@@ -20,7 +20,7 @@ jobs:
         id: set-matrix
         run: |
           # matrix=$( cat .github/workflows/base_node_binaries.json | jq -s -c .[] )
-          matrix=$( cat .github/workflows/matrix-test.json | jq -s -c .[] )
+          matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
           echo $matrix
           echo $matrix | jq .
           echo "::set-output name=matrix::$matrix"
@@ -65,6 +65,11 @@ jobs:
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
+
+      - name: Dump matrix context OS
+        env:
+          MATRIX_CONTEXT_OS: ${{ toJson(matrix).os }}
+        run: echo "$MATRIX_CONTEXT_OS"
 
       - name: Testing
         shell: bash
