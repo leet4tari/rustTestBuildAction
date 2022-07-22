@@ -72,7 +72,7 @@ jobs:
 
       - name: Dump matrix context OS
         env:
-          MATRIX_CONTEXT_OS: ${{ fromJson(matrix).os }}
+          MATRIX_CONTEXT_OS: ${{ fromJson(matrix).builds.os }}
         run: echo "$MATRIX_CONTEXT_OS"
 
       - name: Testing
@@ -86,4 +86,4 @@ jobs:
           jq -s -c .[] .github/workflows/base_node_binaries.json
           echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] | select(."build"==$jsonVar) | to_entries[] | .key + "=" + ( .value | tostring )' .github/workflows/base_node_binaries.json )
           echo ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-          echo ${{ fromJson(needs.matrix-prep.outputs.matrix).build }}
+          echo ${{ fromJson(needs.matrix-prep.outputs.matrix).builds }}
