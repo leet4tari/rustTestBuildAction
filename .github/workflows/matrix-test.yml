@@ -21,8 +21,8 @@ jobs:
         run: |
           # matrix=$( jq -s -c .[] .github/workflows/base_node_binaries.json )
           # matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
-          matrix_selection=$( jq -c '.[] | select( "build_enabled" != false ) ' .github/workflows/matrix-test.json )
-          matrix='{ "builds":'${matrix_selection}' }'
+          matrix_selection=$( jq -c '.builds[] | select( "build_enabled" != false )' .github/workflows/matrix-test.json )
+          matrix=$(echo ${matrix_selection} | jq -s -c '{"builds": [.]}')
           echo $matrix
           echo $matrix | jq .
           echo "::set-output name=matrix::$matrix"
