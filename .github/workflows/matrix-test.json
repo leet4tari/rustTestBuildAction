@@ -1,11 +1,12 @@
 {
-  "build": [
-    "x86",
-    "arm64"
-  ],
-  "os": [
-    "linux",
-    "macos",
-    "windows"
+  "builds": [
+    {
+      "name": "linux-x86",
+      "os": "ubuntu-18.04"
+    },
+    {
+      "name": "linux-arm64",
+      "os": "ubuntu-18.04"
+    }
   ]
 }
