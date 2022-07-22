@@ -61,9 +61,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Dump matrix
-        env:
-        run: echo ${{ matrix }}
+#      - name: Dump matrix
+#        env:
+#        run: echo ${{ matrix }}
 
       - name: Dump matrix context
         env:
