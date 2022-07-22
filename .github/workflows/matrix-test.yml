@@ -19,8 +19,9 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          # matrix=$( cat .github/workflows/base_node_binaries.json | jq -s -c .[] )
-          matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
+          # matrix=$( jq -s -c .[] .github/workflows/base_node_binaries.json )
+          # matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
+          matrix=$( jq -s -c .[] | select(."build_enabled" != false ) .github/workflows/matrix-test.json )
           echo $matrix
           echo $matrix | jq .
           echo "::set-output name=matrix::$matrix"
@@ -41,31 +42,16 @@ jobs:
           echo $matrix | json2yaml
 
   build:
-    name: Build ${{ matrix.builds.name }} on ${{ matrix.builds.os }}
+    name: Building ${{ matrix.builds.name }} on ${{ matrix.builds.runs-on }}
     needs: matrix-prep
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-#      matrix:
-#        build: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-#      matrix:
-#        build:
-#          [
-#            linux-x86_64, linux-arm64,
-#          ]
-#            linux-x86_64, linux-arm64,
-#            macos-x86_64, macos-arm64,
-#            windows-x64, windows-arm64,
-    #runs-on: ${{ matrix.os }}
     #runs-on: ubuntu-latest
     runs-on: ${{ matrix.builds.runs-on }}
     steps:
     #continue-on-error: true
       - uses: actions/checkout@v2
-
-#      - name: Dump matrix
-#        env:
-#        run: echo ${{ matrix }}
 
       - name: Dump matrix context
         continue-on-error: true
@@ -95,12 +81,8 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          echo "${{ matrix.build }}"
-          which jq
-          jq --version
-          ls -al .github/workflows/base_node_binaries.json
-          cat .github/workflows/base_node_binaries.json
+          echo "${{ matrix.builds }}"
           jq -s -c .[] .github/workflows/base_node_binaries.json
-          echo $(jq --arg jsonVar "${{ matrix.build }}" -r '. [] | select(."build"==$jsonVar) | to_entries[] | .key + "=" + ( .value | tostring )' .github/workflows/base_node_binaries.json )
+          # echo $(jq --arg jsonVar "${{ matrix.builds }}" -r '. [] | select(."build"==$jsonVar) | to_entries[] | .key + "=" + ( .value | tostring )' .github/workflows/base_node_binaries.json )
           echo ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-          echo ${{ fromJson(needs.matrix-prep.outputs.matrix).builds }}
+          echo ${{ fromJson(needs.matrix-prep.outputs.matrix.builds) }}
