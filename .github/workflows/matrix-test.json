@@ -1,5 +1,5 @@
 {
-  "os": [
+  "build": [
     "ubuntu-18.04",
     "ubuntu-latest",
     "macos-11"
