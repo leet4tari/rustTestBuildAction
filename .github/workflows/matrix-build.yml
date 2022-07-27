@@ -56,8 +56,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-    #runs-on: ubuntu-latest
     runs-on: ${{ matrix.builds.runs-on }}
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -121,8 +121,8 @@ jobs:
       - name: Copy binaries to folder for zipping
         shell: bash
         run: |
-          mkdir -p "${{ runner.temp }}{TBN_DIST}"
-          cd "${{ runner.temp }}{TBN_DIST}"
+          mkdir -p "${{ runner.temp }}${{ env.TBN_DIST }}"
+          cd "${{ runner.temp }}${{ env.TBN_DIST }}"
           pwd
           VERSION="v0.0.1"
           echo "Branch: ${VBRANCH}"
@@ -141,6 +141,7 @@ jobs:
               cp -v "$GITHUB_WORKSPACE/target/${{ matrix.builds.target }}/release/${FILE}${TBN_EXT}" .
             fi
           done
+          ls -la
 
       - name: Archive and Checksum Binaries
         shell: bash
