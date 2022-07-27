@@ -79,8 +79,8 @@ jobs:
 
   build:
     name: Building ${{ matrix.builds.name }} on ${{ matrix.builds.runs-on }}
-    #needs: [ matrix-prep, create-release ]
-    needs: matrix-prep
+    needs: [ matrix-prep, create-release ]
+    #needs: matrix-prep
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
@@ -121,12 +121,12 @@ jobs:
           name: ${{ matrix.builds.target }}-cross-compile-sample
           path: target/${{ matrix.builds.target }}/release/cross-compile-sample
 
-    - name: Upload release archive
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        files: |
-          LICENSE
-          README.md
-          target/${{ matrix.builds.target }}/release/cross-compile-sample
+      - name: Upload release archive
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            LICENSE
+            README.md
+            target/${{ matrix.builds.target }}/release/cross-compile-sample
