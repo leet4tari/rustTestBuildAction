@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Set to force version number, e.g., when no tag exists.
-      LEET_VERSION: TEST-0.0.2
+      LEET_VERSION: TEST-0.0.3
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       leet_version: ${{ env.LEET_VERSION }}
@@ -113,7 +113,7 @@ jobs:
         with:
           use-cross: ${{ matrix.builds.cross }}
           command: build
-          args: --release --target ${{ matrix.builds.target }} --features ${{ matrix.builds.features }} ${{ matrix.builds.target_bins }}
+          args: --release --target ${{ matrix.builds.target }} ${{ matrix.builds.target_bins }}
 
       - name: Artifact upload
         uses: actions/upload-artifact@v2
