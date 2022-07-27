@@ -113,7 +113,7 @@ jobs:
         with:
           use-cross: ${{ matrix.builds.cross }}
           command: build
-          args: --release --target ${{ matrix.builds.target }} --features ${{ matrix.builds.features }} ${{ matrix.builds.target_bins }} --locked
+          args: --release --target ${{ matrix.builds.target }} --features ${{ matrix.builds.features }} ${{ matrix.builds.target_bins }}
 
       - name: Artifact upload
         uses: actions/upload-artifact@v2
