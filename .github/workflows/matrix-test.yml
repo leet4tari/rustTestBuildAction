@@ -79,7 +79,8 @@ jobs:
 
   build:
     name: Building ${{ matrix.builds.name }} on ${{ matrix.builds.runs-on }}
-    needs: [ matrix-prep, create-release ]
+    #needs: [ matrix-prep, create-release ]
+    needs: matrix-prep
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
