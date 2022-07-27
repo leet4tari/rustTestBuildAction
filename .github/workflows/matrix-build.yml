@@ -11,7 +11,7 @@ on:
 env:
   TBN_FILENAME: "leet_suite"
   toolchain: nightly-2022-05-01
-  matrix-json-file: ".github/workflows/base_node_binaries.json"
+  matrix-json-file: ".github/workflows/matrix-build.json"
 
 jobs:
   matrix-prep:
@@ -24,11 +24,11 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          # matrix=$( jq -s -c .[] .github/workflows/matrix-build.json )
+          # matrix=$( jq -s -c .[] ${{ env.matrix-json-file }} )
           # target selection of build images
-          # matrix_selection=$( jq -c '.[] | select( ."build_enabled" != false )' .github/workflows/matrix-test.json )
-          # matrix_selection=$( jq -c '.[] | select( ."name" == "linux-x86" )' .github/workflows/matrix-test.json )
-          matrix_selection=$( jq -c '.[] | select( ."build_enabled" == true )' .github/workflows/matrix-test.json )
+          # matrix_selection=$( jq -c '.[] | select( ."build_enabled" != false )' ${{ env.matrix-json-file }} )
+          # matrix_selection=$( jq -c '.[] | select( ."name" == "linux-x86" )' ${{ env.matrix-json-file }} )
+          matrix_selection=$( jq -c '.[] | select( ."build_enabled" == true )' ${{ env.matrix-json-file }} )
           # Rebuild the json matrix
           matrix=$(echo ${matrix_selection} | jq -s -c '{"builds": .}')
           echo $matrix
