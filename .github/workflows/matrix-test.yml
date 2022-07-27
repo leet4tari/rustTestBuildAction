@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Set to force version number, e.g., when no tag exists.
-      LEET_VERSION: TEST-0.0.0
+      LEET_VERSION: TEST-0.0.2
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       leet_version: ${{ env.LEET_VERSION }}
