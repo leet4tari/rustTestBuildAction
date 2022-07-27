@@ -18,7 +18,6 @@
     "target": "aarch64-unknown-linux-gnu",
     "cross": false,
     "target_cpu": "generic",
-    "target_bins": "--bin tari_base_node --bin tari_console_wallet --bin tari_merge_mining_proxy --bin tari_miner --bin tari_validator_node",
     "features": "safe",
     "build_enabled": true
   },

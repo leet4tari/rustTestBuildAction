@@ -92,6 +92,15 @@ jobs:
           echo "LIB_PRE=" >> $GITHUB_ENV
           echo "SHELL_EXT=.bat" >> $GITHUB_ENV
 
+      - name: Install macOS dependencies
+        if: startsWith(runner.os,'macOS')
+        run: brew install cmake zip coreutils automake autoconf
+
+      - name: Install Windows dependencies
+        if: startsWith(runner.os,'Windows')
+        run: |
+          choco upgrade zip psutils -y
+
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
