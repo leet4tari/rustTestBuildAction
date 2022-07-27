@@ -14,28 +14,31 @@ jobs:
     runs-on: ubuntu-latest
     # env:
       # Set to force version number, e.g., when no tag exists.
-      # RG_VERSION: TEST-0.0.0
+      # LEET_VERSION: TEST-0.0.0
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
-      rg_version: ${{ env.RG_VERSION }}
+      leet_version: ${{ env.LEET_VERSION }}
     steps:
       - name: Get the release version from the tag
         shell: bash
-        if: env.RG_VERSION == ''
+        if: env.LEET_VERSION == ''
         run: |
-          # Apparently, this is the right way to get a tag name. Really?
-          #
-          # See: https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/m-p/32167/highlight/true#M1027
-          echo "RG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "version is: ${{ env.RG_VERSION }}"
+          echo "LEET_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "version is: ${{ env.LEET_VERSION }}"
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ env.RG_VERSION }}
-          release_name: ${{ env.RG_VERSION }}
+          tag_name: ${{ env.LEET_VERSION }}
+          release_name: ${{ env.LEET_VERSION }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
 
   matrix-prep:
     runs-on: ubuntu-latest
@@ -50,7 +53,8 @@ jobs:
           # matrix=$( jq -s -c .[] .github/workflows/base_node_binaries.json )
           # matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
           # target selection of build images
-          matrix_selection=$( jq -c '.builds[] | select( ."build_enabled" != false )' .github/workflows/matrix-test.json )
+          #matrix_selection=$( jq -c '.[] | select( ."build_enabled" != false )' .github/workflows/matrix-test.json )
+          matrix_selection=$( jq -c '.[] | select( ."name" == "linux-x86" )' .github/workflows/matrix-test.json )
           # Rebuild the json matrix
           matrix=$(echo ${matrix_selection} | jq -s -c '{"builds": .}')
           echo $matrix
@@ -74,46 +78,53 @@ jobs:
 
   build:
     name: Building ${{ matrix.builds.name }} on ${{ matrix.builds.runs-on }}
-    needs: matrix-prep
+    needs: [ matrix-prep, create-release ]
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
     #runs-on: ubuntu-latest
     runs-on: ${{ matrix.builds.runs-on }}
     steps:
-    #continue-on-error: true
-      - uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          submodules: false
 
-      - name: Dump matrix context
-        continue-on-error: true
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: rustfmt, clippy
+          toolchain: ${{ matrix.builds.rust }}
+          target: ${{ matrix.builds.target }}
+          override: true
+
+      - name: Cache cargo files and outputs
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build rust binaries - Normal
+        if: ${{ matrix.builds.name != 'linux-arm64' }}
+        uses: actions-rs/cargo@v1
         env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+          # RUSTFLAGS: "-C target_cpu=${{ matrix.builds.target_cpu }}"
+          ROARING_ARCH: "${{ matrix.builds.target_cpu }}"
+        with:
+          use-cross: ${{ matrix.builds.cross }}
+          command: build
+          args: --release --target ${{ matrix.builds.target }} --features ${{ matrix.builds.features }} ${{ matrix.builds.target_bins }} --locked
 
-      - name: Dump matrix builds context
-        continue-on-error: true
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix.builds) }}
-        run: echo "$MATRIX_CONTEXT"
+      - name: Artifact upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.builds.target }}-cross-compile-sample
+          path: target/${{ matrix.builds.target }}/release/cross-compile-sample
 
-      - name: Dump matrix builds os context
-        continue-on-error: true
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix.builds.os) }}
-        run: echo "$MATRIX_CONTEXT"
-
-      - name: Dump matrix builds target_cpu context
-        continue-on-error: true
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix.builds.target_cpu) }}
-        run: echo "$MATRIX_CONTEXT"
-
-      - name: Testing
-        continue-on-error: true
-        shell: bash
-        run: |
-          echo "${{ matrix.builds }}"
-          jq -s -c .[] .github/workflows/base_node_binaries.json
-          # echo $(jq --arg jsonVar "${{ matrix.builds }}" -r '. [] | select(."build"==$jsonVar) | to_entries[] | .key + "=" + ( .value | tostring )' .github/workflows/base_node_binaries.json )
-          echo ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
-          echo ${{ fromJson(needs.matrix-prep.outputs.matrix.builds) }}
+    - name: Upload release archive
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          LICENSE
+          README.md
+          target/${{ matrix.builds.target }}/release/cross-compile-sample
