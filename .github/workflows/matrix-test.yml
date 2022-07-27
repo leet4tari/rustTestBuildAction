@@ -12,9 +12,9 @@ jobs:
   create-release:
     name: create-release
     runs-on: ubuntu-latest
-    # env:
+    env:
       # Set to force version number, e.g., when no tag exists.
-      # LEET_VERSION: TEST-0.0.0
+      LEET_VERSION: TEST-0.0.0
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       leet_version: ${{ env.LEET_VERSION }}
@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "LEET_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           echo "version is: ${{ env.LEET_VERSION }}"
+
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
@@ -53,7 +54,7 @@ jobs:
           # matrix=$( jq -s -c .[] .github/workflows/base_node_binaries.json )
           # matrix=$( jq -s -c .[] .github/workflows/matrix-test.json )
           # target selection of build images
-          #matrix_selection=$( jq -c '.[] | select( ."build_enabled" != false )' .github/workflows/matrix-test.json )
+          # matrix_selection=$( jq -c '.[] | select( ."build_enabled" != false )' .github/workflows/matrix-test.json )
           matrix_selection=$( jq -c '.[] | select( ."name" == "linux-x86" )' .github/workflows/matrix-test.json )
           # Rebuild the json matrix
           matrix=$(echo ${matrix_selection} | jq -s -c '{"builds": .}')
