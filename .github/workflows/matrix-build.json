@@ -16,7 +16,7 @@
     "rust": "stable",
     "os": "linux",
     "target": "aarch64-unknown-linux-gnu",
-    "cross": false,
+    "cross": true,
     "target_cpu": "generic",
     "features": "safe",
     "build_enabled": true
