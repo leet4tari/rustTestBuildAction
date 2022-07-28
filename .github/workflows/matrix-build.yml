@@ -75,7 +75,6 @@ jobs:
         if: "!startsWith(runner.os,'Windows')"
         run: |
           echo "SHARUN=shasum --algorithm 256" >> $GITHUB_ENV
-          echo "ARCHIVERUN=zip -j" >> $GITHUB_ENV
           echo "CC=gcc" >> $GITHUB_ENV
           echo "TBN_EXT=" >> $GITHUB_ENV
           echo "LIB_PRE=lib" >> $GITHUB_ENV
@@ -88,7 +87,6 @@ jobs:
         shell: bash
         run: |
           echo "SHARUN=pwsh C:\ProgramData\chocolatey\lib\psutils\tools\psutils-master\shasum.ps1 --algorithm 256" >> $GITHUB_ENV
-          echo "ARCHIVERUN=7z a" >> $GITHUB_ENV
           echo "TBN_EXT=.exe" >> $GITHUB_ENV
           echo "LIB_EXT=.dll" >> $GITHUB_ENV
           echo "LIB_PRE=" >> $GITHUB_ENV
@@ -96,7 +94,7 @@ jobs:
 
       - name: Install macOS dependencies
         if: startsWith(runner.os,'macOS')
-        run: brew install cmake zip coreutils automake autoconf
+        run: brew install cmake coreutils automake autoconf
 
       - name: Install Windows dependencies
         if: startsWith(runner.os,'Windows')
@@ -161,9 +159,9 @@ jobs:
           cd "${{ runner.temp }}${{ env.TBN_DIST }}"
           pwd
           ls -la
-          "${{ env.ARCHIVERUN }} "${{ env.BINFILE }}.zip" *
+          7z a "${{ env.BINFILE }}.zip" *
           echo "Compute shasum"
-          ${SHARUN} "${{ env.BINFILE }}.zip" >> "${{ env.BINFILE }}.zip.sha256"
+          7z a "${{ env.BINFILE }}.zip" >> "${{ env.BINFILE }}.zip.sha256"
           cat "${{ env.BINFILE }}.zip.sha256"
           echo "Verifications is "
           ${SHARUN} --check "${{ env.BINFILE }}.zip.sha256"
