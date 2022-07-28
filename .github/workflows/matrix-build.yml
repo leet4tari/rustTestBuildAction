@@ -161,7 +161,7 @@ jobs:
           ls -la
           7z a "${{ env.BINFILE }}.zip" *
           echo "Compute shasum"
-          7z a "${{ env.BINFILE }}.zip" >> "${{ env.BINFILE }}.zip.sha256"
+          ${SHARUN} "${{ env.BINFILE }}.zip" >> "${{ env.BINFILE }}.zip.sha256"
           cat "${{ env.BINFILE }}.zip.sha256"
           echo "Verifications is "
           ${SHARUN} --check "${{ env.BINFILE }}.zip.sha256"
