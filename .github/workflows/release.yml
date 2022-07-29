@@ -30,9 +30,13 @@ jobs:
           echo "version is: ${{ env.LEET_VERSION }}"
 
       - name: Download builds and release notes
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: builds
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: builds
 
       - name: Create GitHub release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
