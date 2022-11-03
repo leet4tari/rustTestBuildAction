@@ -1,0 +1,61 @@
+[
+  {
+    "name": "linux-x86",
+    "runs-on": "ubuntu-18.04",
+    "rust": "nightly-2021-11-20",
+    "target": "x86_64-unknown-linux-gnu",
+    "cross": false,
+    "os": "linux",
+    "target_cpu": "x86-64",
+    "features": "safe",
+    "build_enabled": true
+  },
+  {
+    "name": "linux-arm64",
+    "runs-on": "ubuntu-18.04",
+    "rust": "stable",
+    "os": "linux",
+    "target": "aarch64-unknown-linux-gnu",
+    "cross": true,
+    "target_cpu": "generic",
+    "features": "safe",
+    "build_enabled": true
+  },
+  {
+    "name": "macos-x86",
+    "runs-on": "macos-11",
+    "rust": "stable",
+    "target": "x86_64-apple-darwin",
+    "os": "macos",
+    "target_cpu": "x86-64",
+    "features": "safe"
+  },
+  {
+    "name": "macos-arm64",
+    "runs-on": "ubuntu-18.04",
+    "os": "macos",
+    "target_cpu": "generic"
+  },
+  {
+    "name": "windows-x64",
+    "runs-on": "windows-latest",
+    "os": "windows",
+    "rust": "stable",
+    "target": "x86_64-pc-windows-msvc",
+    "cross": false,
+    "target_cpu": "x86-64",
+    "features": "safe",
+    "build_enabled": true
+  },
+  {
+    "name": "windows-arm64",
+    "runs-on": "windows-latest",
+    "os": "windows",
+    "rust": "stable",
+    "target": "aarch64-pc-windows-msvc",
+    "cross": false,
+    "target_cpu": "generic",
+    "features": "safe",
+    "build_enabled": false
+  }
+]
