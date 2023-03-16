@@ -1,7 +1,12 @@
+---
 name: Multi Platform Builder - Test
 
-on:
+'on':
   push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]*'
+    branches:
+      - 'build-*'
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '15 01 * * WED'
@@ -9,6 +14,16 @@ on:
 #    - cron:  '*/30 * * * *'
   workflow_dispatch:
     inputs:
+      tari_network:
+        default: mainnet
+        description: 'Tari network selector'
+        type: choice
+        options:
+          - mainnet
+          # pre
+          - esme
+          # rc
+          - nextnet
       logLevel:
         description: 'Log level'
         required: true
@@ -33,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [ubuntu-latest]
 #        os: [ubuntu-18.04]
 #        os: [macos-latest]
 #        os: [ubuntu-18.04, windows-2019]
@@ -43,16 +58,16 @@ jobs:
 #        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15, macos-11.0, windows-2016, windows-2019]
         # rustc --print target-features
         # features=+avx2,+fma?
-        features: ["safe", "avx2"]
-#        features: ["safe"]
+#        features: ["safe", "avx2"]
+        features: ["safe"]
         # rustc --print target-list?
         # rustc -C target-cpu=help
 #        target_cpu: ["x86-64", "ivybridge", "skylake", "skylake-avx512"]
-        target_cpu: ["x86-64", "broadwell"]
-#        target_cpu: ["x86-64"]
-        exclude:
-          - target_cpu: "x86-64"
-            features: "avx2"
+#        target_cpu: ["x86-64", "broadwell"]
+        target_cpu: ["x86-64"]
+#        exclude:
+#          - target_cpu: "x86-64"
+#            features: "avx2"
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -69,6 +84,18 @@ jobs:
         echo "Event.Schedule: ${{ github.event.schedule }}"
         echo "Log level: ${{ github.event.inputs.logLevel }}"
         echo "Tags: ${{ github.event.inputs.tags }}"
+        echo $tagnet
+        # Match is not RegEx, but wildcards/globs
+        case "$tagnet" in
+          v*-pre.*) TARI_NETWORK=esme
+            ;;
+          v*-rc.*) TARI_NETWORK=nextnet
+            ;;
+          *) TARI_NETWORK=mainnet
+            ;;
+        esac
+        echo ${TARI_NETWORK}
+        echo "TARI_NETWORK=${TARI_NETWORK}" >> $GITHUB_ENV
 
     - name: Skip this step every 24 hours
       id: vars-skip
